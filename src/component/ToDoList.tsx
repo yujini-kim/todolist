@@ -13,7 +13,7 @@ function ToDoList() {
       <CreateTodo />
       <ul>
         {toDos.map((todo) => (
-          <Todo {...todo} />
+          <Todo key={todo.id} {...todo} />
         ))}
       </ul>
     </div>
