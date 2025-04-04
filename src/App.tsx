@@ -7,6 +7,7 @@ import {
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { toDoState } from './atoms';
+import DragableCard from './component/DragableCard';
 
 const Wrapper = styled.div`
   display: flex;
@@ -32,13 +33,6 @@ const Board = styled.div`
   min-height: 200px;
 `;
 
-const Card = styled.div`
-  border-radius: 5px;
-  margin-bottom: 5px;
-  padding: 10px 10px;
-  background-color: ${(props) => props.theme.cardColor};
-`;
-
 const toDos = ['a', 'b', 'c', 'd', 'e', 'f'];
 
 function App() {
@@ -47,8 +41,14 @@ function App() {
     if (!destination) return;
     setToDos((oldToDos) => {
       const copyToDos = [...oldToDos];
+      console.log('Delete item on', source.index);
+      console.log(copyToDos);
       copyToDos.splice(source.index, 1);
+      console.log('Delete item');
+      console.log(copyToDos);
       copyToDos.splice(destination?.index, 0, draggableId);
+      console.log('Put back', draggableId, 'on', destination.index);
+      console.log(copyToDos);
       return copyToDos;
     });
   };
@@ -60,17 +60,7 @@ function App() {
             {(magic) => (
               <Board ref={magic.innerRef} {...magic.droppableProps}>
                 {toDos.map((toDo, index) => (
-                  <Draggable key={toDo} draggableId={toDo} index={index}>
-                    {(magic) => (
-                      <Card
-                        ref={magic.innerRef}
-                        {...magic.dragHandleProps}
-                        {...magic.draggableProps}
-                      >
-                        {toDo}
-                      </Card>
-                    )}
-                  </Draggable>
+                  <DragableCard key={toDo} index={index} toDo={toDo} />
                 ))}
                 {magic.placeholder}
               </Board>
