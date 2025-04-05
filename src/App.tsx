@@ -1,7 +1,7 @@
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
-import { toDoState } from './atoms';
+import { IToDoState, toDoState } from './atoms';
 
 import Board from './component/Board';
 
@@ -24,7 +24,50 @@ const Boards = styled.div`
 
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
-  const onDragEnd = (info: DropResult) => {};
+  const onDragEnd = ({ draggableId, destination, source }: DropResult) => {
+    if (!destination) return;
+    setToDos((allBoards) => {
+      const copyToDos: IToDoState = {};
+      Object.keys(allBoards).forEach((toDosKey) => {
+        copyToDos[toDosKey] = [...allBoards[toDosKey]];
+      });
+      copyToDos[source.droppableId].splice(source.index, 1);
+      copyToDos[destination.droppableId].splice(
+        destination.index,
+        0,
+        draggableId
+      );
+      return copyToDos;
+    });
+  };
+  // const onDragEnd = (info: DropResult) => {
+  //   const { destination, draggableId, source } = info;
+  //   if (!destination) return;
+  //   if (destination?.droppableId === source.droppableId) {
+  //     setToDos((allBoard) => {
+  //       const boardCopy = [...allBoard[source.droppableId]];
+  //       boardCopy.splice(source.index, 1);
+  //       boardCopy.splice(destination?.index, 0, draggableId);
+  //       return {
+  //         [source.droppableId]: boardCopy,
+  //         ...allBoard,
+  //       };
+  //     });
+  //   }
+  //   if(destination.droppableId !== source.droppableId){
+  //     setToDos((allBoard)=>{
+  //       const sourceBoard = [...allBoard[source.droppableId]];
+  //       const targetBoard = [...allBoard[destination.droppableId]]
+  //       sourceBoard.splice(source.index, 1)
+  //       targetBoard.splice(destination?.index, 0, draggableId);
+  //       return {
+  //         ...allBoard,
+  //         [source.droppableId]:sourceBoard,
+  //         [destination.droppableId]:targetBoard
+  //       }
+  //     })
+  //   }
+  // };
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Wrapper>
