@@ -14,9 +14,13 @@ interface IProps {
   index: number;
 }
 
-const DragableCard = ({ toDo, index }: IProps) => {
+const DraggableCard = ({ toDo, index }: IProps) => {
   return (
-    <Draggable key={toDo} draggableId={toDo} index={index}>
+    <Draggable
+      key={`${index}-${toDo}`}
+      draggableId={`${index}-${toDo}`}
+      index={index}
+    >
       {(magic) => (
         <Card
           ref={magic.innerRef}
@@ -30,4 +34,4 @@ const DragableCard = ({ toDo, index }: IProps) => {
   );
 };
 
-export default React.memo(DragableCard);
+export default React.memo(DraggableCard);
