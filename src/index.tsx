@@ -58,7 +58,7 @@ html, body, #root {
     height: 100%; 
   }
   body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins',"Noto Sans KR", sans-serif;
     background-color:${(props) => props.theme.bgColor};
     color:black;
     line-height: 1;
