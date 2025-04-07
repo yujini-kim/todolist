@@ -1,14 +1,11 @@
 import { Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import DraggableCard from './DraggableCard';
-import { useForm } from 'react-hook-form';
-import { ITodo, toDoState } from '../atoms';
-import { useSetRecoilState } from 'recoil';
+import { ITodo } from '../atoms';
 import InputText from './InputText';
 
 const Wrapper = styled.div`
   width: 300px;
-
   padding-top: 10px;
   background-color: ${(props) => props.theme.boardColor};
   border-radius: 5px;

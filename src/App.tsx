@@ -1,8 +1,16 @@
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
-import { toDoState } from './atoms';
+import { toDoClick, toDoState } from './atoms';
 import Board from './component/Board';
+import Delete from './component/Delete';
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+`;
 
 const Wrapper = styled.div`
   display: flex;
@@ -23,48 +31,65 @@ const Boards = styled.div`
 
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  const [Click, setClick] = useRecoilState(toDoClick);
   const onDragEnd = (info: DropResult) => {
-    const { destination, draggableId, source } = info;
+    const { destination, source } = info;
+    setClick(false);
     if (!destination) return;
-    if (destination?.droppableId === source.droppableId) {
-      // same board movement.
+
+    // 삭제 droppable로 드롭되었을 때
+    if (destination.droppableId === 'delete') {
+      setToDos((allBoards) => {
+        const copy = { ...allBoards };
+        copy[source.droppableId] = [...copy[source.droppableId]];
+        copy[source.droppableId].splice(source.index, 1);
+        return copy;
+      });
+      return;
+    }
+
+    // 동일 보드 내 이동
+    if (destination.droppableId === source.droppableId) {
       setToDos((allBoards) => {
         const boardCopy = [...allBoards[source.droppableId]];
         const taskObj = boardCopy[source.index];
         boardCopy.splice(source.index, 1);
-        boardCopy.splice(destination?.index, 0, taskObj);
+        boardCopy.splice(destination.index, 0, taskObj);
         return {
           ...allBoards,
           [source.droppableId]: boardCopy,
         };
       });
+      return;
     }
-    if (destination.droppableId !== source.droppableId) {
-      // cross board movement
-      setToDos((allBoards) => {
-        const sourceBoard = [...allBoards[source.droppableId]];
-        const taskObj = sourceBoard[source.index];
-        const destinationBoard = [...allBoards[destination.droppableId]];
-        sourceBoard.splice(source.index, 1);
-        destinationBoard.splice(destination?.index, 0, taskObj);
-        return {
-          ...allBoards,
-          [source.droppableId]: sourceBoard,
-          [destination.droppableId]: destinationBoard,
-        };
-      });
-    }
+
+    // 크로스 보드 이동 (delete가 아닌 경우)
+    setToDos((allBoards) => {
+      const sourceBoard = [...allBoards[source.droppableId]];
+      const taskObj = sourceBoard[source.index];
+      const destinationBoard = [...allBoards[destination.droppableId]];
+      sourceBoard.splice(source.index, 1);
+      destinationBoard.splice(destination.index, 0, taskObj);
+      return {
+        ...allBoards,
+        [source.droppableId]: sourceBoard,
+        [destination.droppableId]: destinationBoard,
+      };
+    });
   };
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Wrapper>
-        <Boards>
-          {Object.keys(toDos).map((boardId) => (
-            <Board boardId={boardId} key={boardId} toDos={toDos[boardId]} />
-          ))}
-        </Boards>
-      </Wrapper>
-    </DragDropContext>
+    <Container>
+      <DragDropContext onDragEnd={onDragEnd}>
+        {Click ? <Delete show={Click} /> : null}
+        <Wrapper>
+          <Boards>
+            {Object.keys(toDos).map((boardId) => (
+              <Board boardId={boardId} key={boardId} toDos={toDos[boardId]} />
+            ))}
+          </Boards>
+        </Wrapper>
+      </DragDropContext>
+    </Container>
   );
 }
 

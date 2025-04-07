@@ -1,7 +1,10 @@
 import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import { useSetRecoilState } from 'recoil';
 
 import styled from 'styled-components';
+import { toDoClick } from '../atoms';
+
 const Card = styled.div<{ idDragging: boolean }>`
   border-radius: 5px;
   margin-bottom: 5px;
@@ -19,10 +22,16 @@ interface IProps {
 }
 
 const DraggableCard = ({ toDoId, toDoText, index }: IProps) => {
+  const setClick = useSetRecoilState(toDoClick);
+  const onMouseDown = () => {
+    setClick((pre) => !pre);
+  };
+
   return (
     <Draggable draggableId={toDoId + ''} index={index}>
       {(magic, snapshot) => (
         <Card
+          onMouseDown={onMouseDown}
           idDragging={snapshot.isDragging}
           ref={magic.innerRef}
           {...magic.dragHandleProps}

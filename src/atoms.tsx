@@ -20,3 +20,8 @@ export const toDoState = atom<IToDoState>({
         DONE: [],
       },
 });
+
+export const toDoClick = atom({
+  key: 'click',
+  default: false,
+});
